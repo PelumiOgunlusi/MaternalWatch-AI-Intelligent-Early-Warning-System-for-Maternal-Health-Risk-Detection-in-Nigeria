@@ -1,0 +1,580 @@
+---
+author: PELUMI OGUNLUSI
+title: "Maternal Watch AI Intelligent Early Warning System for Maternal Health Risk Detection in Nigeria"
+format: html
+---
+
+# Problem Statement
+Nigeria faces a devastating maternal health crisis, accounting for 29% of all maternal deaths globally with approximately 75,000 maternal deaths annually - equivalent to one death every seven minutes. The maternal mortality rate stands at 993 deaths per 100,000 live births in 2023, far exceeding the Sustainable Development Goal target of fewer than 70 deaths per 100,000 by 2030.
+
+The primary challenges contributing to this crisis include:
+
+- Inadequate healthcare infrastructure in rural communities, with women traveling an average of 3.3 km to reach healthcare facilities
+
+- Limited access to skilled healthcare providers during pregnancy and childbirth
+
+- Late detection of high-risk pregnancies due to insufficient monitoring and diagnostic tools
+
+- Poor digitization of maternal healthcare leading to delays in emergency interventions
+
+- Lack of real-time health monitoring for pregnant women, particularly in remote areas
+
+Traditional healthcare systems struggle to provide timely interventions for conditions like postpartum hemorrhage (27% of deaths), sepsis (11%), hypertensive disorders (14%), and unsafe abortions (8%). The absence of predictive analytics and early warning systems results in preventable maternal deaths that could be avoided with timely medical intervention.
+
+# Problem Scope
+## Solution Overview
+MaternalWatch AI is an integrated digital health platform that leverages artificial intelligence and machine learning to provide real-time maternal health risk assessment and early warning capabilities for pregnant women in Nigeria. The solution combines mobile health technology, predictive analytics, and telemedicine to create a comprehensive maternal health monitoring ecosystem.
+
+## Core Problem It Solves
+The platform addresses the critical gap in early detection and prevention of maternal health complications by:
+
+- Predictive Risk Assessment: Utilizing machine learning algorithms to analyze maternal health data (blood pressure, heart rate, blood glucose, body temperature, age) to classify pregnancy risk levels as low, medium, or high-risk
+
+- Real-time Monitoring: Implementing mobile health applications that enable continuous tracking of vital signs and pregnancy symptoms, increasing preeclampsia knowledge by 179% as demonstrated in similar Nigerian implementations
+
+- Early Warning System: Deploying AI-powered alerts to healthcare providers when risk thresholds are exceeded, enabling timely interventions that can prevent maternal deaths
+
+- Telemedicine Integration: Connecting pregnant women in remote areas with skilled healthcare providers through digital platforms, removing geographical barriers to care
+
+# Target Users
+## Primary Users:
+
+- Pregnant women in urban and rural Nigeria, particularly those in underserved communities
+
+- Healthcare providers including midwives, nurses, and doctors in primary healthcare centers
+
+- Community health workers serving as intermediaries in remote areas
+
+## Secondary Users:
+
+- Healthcare administrators for data-driven decision making
+
+- Policy makers for maternal health program planning and resource allocation
+
+- Family members for pregnancy support and emergency response
+
+# Technical Implementation
+## The solution integrates:
+
+- Mobile applications for patient data collection and education (similar to the MyBelle pregnancy app successfully deployed in Nigeria)
+
+- AI/ML algorithms using Random Forest and Neural Network models achieving 95% accuracy in maternal health risk classification
+
+- Cloud-based analytics for real-time data processing and risk assessment
+
+- SMS and voice messaging for low-resource environments with limited internet connectivity
+
+- Integration with existing health systems including the National Health Management Information System (NHMIS)
+
+## Expected Impact
+Based on evidence from similar digital health interventions in Nigeria, MaternalWatch AI can:
+
+- Reduce maternal mortality rates by 20% through early detection and intervention
+
+- Increase skilled birth attendance from current 52% to target levels above 70%
+
+- Improve antenatal care utilization through reminder systems and educational content
+
+- Enhance healthcare provider confidence in managing maternal health complications
+
+- Generate actionable health data for evidence-based policy making and resource allocation
+
+This comprehensive approach aligns with Nigeria's national health priorities and leverages the proven effectiveness of digital health solutions in improving maternal health outcomes across sub-Saharan Africa.
+
+# Dataset Understandingng
+The dataset, named `Maternal Health Risk Data Set.csv`, is a comprehensive collection of maternal health data. Each row represents an individual report, and the columns represent various features associated with Marternal Health Risk. Data has been collected from different hospitals, community clinics, maternal health cares through the IoT based risk monitoring system.
+- Age: Age in years when a woman is pregnant.
+- SystolicBP: Upper value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+- DiastolicBP: Lower value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+- BloodGlucose: Blood glucose levels is in terms of a molar concentration, mmol/L.
+- BodyTemp: Body Temperature of Mothers at a point in time during pregnancy 
+- HeartRate: A normal resting heart rate in beats per minute.
+- Risk Level: Predicted Risk Intensity Level during pregnancy considering the previous attribute.
+
+# Source
+[link](https://www.kaggle.com/datasets/csafrit2/maternal-health-risk-data/data)
+
+# Installation and importing of required libraries
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.express as px
+import itables
+import sklearn
+```
+
+# Reading the dataset
+```{python}
+maternal = pd.read_csv("data/Maternal Health Risk Data Set.csv")
+```
+
+# Visual inspection of the dataset
+- Here, we inspect the initial rows, columns, data types, null values, duplicated status, and summary statistics to get an understanding of the dataset's structure
+```{python}
+itables.show(maternal)
+```
+
+```{python}
+maternal.shape
+```
+
+```{python}
+maternal.info()
+```
+
+```{python}
+maternal.isnull().sum()
+```
+
+```{python}
+maternal[maternal.duplicated()]
+```
+
+```{python}
+maternal[maternal.HeartRate < 50] 
+```
+
+```{python}
+maternal['RiskLevel'].value_counts(normalize=True)*100
+```
+
+```{python}
+fig_bar = px.bar(
+    maternal['RiskLevel'].value_counts().reset_index(),
+    x='RiskLevel',
+    y='count',
+    labels={'RiskLevel': 'Risk Level', 'count': 'Count'},
+    title='Bar chart of Maternal risk Reported Cases'
+)
+fig_bar.show()
+```
+
+```{python}
+# Pie chart of fraud reported cases proportion
+fig_pie = px.pie(
+    maternal,
+    names='RiskLevel',
+    title='Pie Chart of Maternal Risk Level Cases',
+    hole=0.3
+)
+fig_pie.show()
+```
+
+# Observations gotten from Initial Visual Data Exploration
+- The dataset consists of 1014 rows and 7 columns 
+- No missing values in the entire dataset
+- The first 6 columns are numeric with only the 'RiskLevel' column being a categorical column
+- RiskLevel is our target variable and the rest of the features will be our predictor variables
+- About 55% (562 rows out of a possible 1014 rows) of the entire dataset is duplicated
+- The proportion of labels in this RiskLevel column is imbalanced implying the need to balance the dataset as we proceed.
+- Range of age is from 10 till 70 years old. Even though it's uncommon, it is possible for some girls to be pregnant at 10 y.o., as well as for some women to be pregnant at 70 y.o. For example, [here](https://www.statista.com/statistics/410744/birth-rate-for-us-girls/) is the data on birth rate for US girls aged 10-14 years.
+- It is imprtant to note that all numerical columns in the dataset should have a minimum value greater than 0
+- When visually exploring the dataset, it was observed that there was an error with heart rate column showing 2 obsevations with the value 7, which doesn't make sense. We will have to fix it. P.S. It looks like there are 2 observations, but it is actually one duplicated.
+- The BodyTemp column is recorded in Fahrenheit and this will be converted to celsius later
+
+# Data cleaning 
+## Droping duplicated data
+
+```{python}
+maternal.drop_duplicates(inplace=True)
+maternal
+```
+
+## Fixing errors in the HeartRate Column
+```{python}
+maternal.HeartRate.mode()
+```
+```{python}
+maternal.loc[maternal.HeartRate == 7, "HeartRate"] = 70
+```
+```{python}
+print(min(maternal['HeartRate']))
+print(max(maternal['HeartRate']))
+```
+
+## Converting Body Temperature column from Fahrenheit to Celsius
+```{python}
+maternal['BodyTemp'] = ((maternal['BodyTemp']- 32)/1.8).round(2)
+```
+# Feature encoding for the target categorical variable
+```{python}
+maternal['RiskLevel'].unique()
+``` 
+- Values in the RiskLevel column are ordinal, in other words, they appear as ordered categories. For this, we can perform a label encoding, where values are manually assigned to the corresponding keys, using the replace() function.
+
+```{python}
+maternal.replace({"high risk":2, "mid risk":1, "low risk":0}, inplace=True)
+maternal
+```
+# Exploring outliers
+```{python}
+plt.figure(figsize=(20, 15))
+plotnumber = 1
+for col in maternal.columns:
+    if plotnumber <= 24:
+        ax = plt.subplot(5, 5, plotnumber)
+        sns.boxplot(maternal[col])
+        plt.xlabel(col, fontsize=15)
+        plotnumber += 1
+plt.tight_layout()
+plt.show()  
+```
+- As we can see from these plots, there are some points that are plotted outside the box plot area and that greatly deviate from the rest of the population. Whether to remove or keep them greatly depends on the understanding of our data and the type of analysis to be performed. In this case, the points that are outside of our box plots might be the actual true data points and do not need to be removed.
+
+# Exploratory data analysis
+## Univariate Analysis
+
+```{python}
+fig, axes = plt.subplots(nrows=1,ncols=2, figsize=(14,6))
+# Diastolic Blood Pressure
+sns.histplot(ax=axes[0], x=maternal.DiastolicBP)
+axes[0].set_title("Distribution of Diastolic Blood Pressure, mmHg")
+# Systolic Blood Pressure
+sns.histplot(ax=axes[1], x=maternal.SystolicBP, color="#ed894e")
+axes[1].set_title("Distribution of Systolic Blood Pressure, mmHg");
+```
+
+```{python}
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(18, 10))
+
+# Age
+sns.histplot(ax=axes[0, 0], x=maternal.Age, kde=True, color="#4e79a7")
+axes[0, 0].set_title("Distribution of Age")
+
+# BloodGlucose
+sns.histplot(ax=axes[0, 1], x=maternal.BloodGlucose, kde=True, color="#f28e2b")
+axes[0, 1].set_title("Distribution of Blood Glucose (mmol/L)")
+
+# BodyTemp
+sns.histplot(ax=axes[0, 2], x=maternal.BodyTemp, kde=True, color="#e15759")
+axes[0, 2].set_title("Distribution of Body Temperature (°C)")
+
+# HeartRate
+sns.histplot(ax=axes[1, 0], x=maternal.HeartRate, kde=True, color="#76b7b2")
+axes[1, 0].set_title("Distribution of Heart Rate (bpm)")
+
+# RiskLevel
+sns.countplot(ax=axes[1, 1], x=maternal.RiskLevel, palette="pastel")
+axes[1, 1].set_title("Distribution of Risk Level")
+axes[1, 1].set_xticklabels(['Low', 'Mid', 'High'])
+
+# Remove empty subplot
+axes[1, 2].axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Bivariate Analysis
+
+```{python}
+# Correlation heatmap for all numerical features
+plt.figure(figsize=(10, 7))
+sns.heatmap(maternal.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("Correlation Heatmap of Maternal Health Features")
+plt.show()
+```
+
+```{python}
+# Pairplot colored by RiskLevel
+sns.pairplot(maternal, hue="RiskLevel", palette="Set2", diag_kind="kde")
+plt.suptitle("Pairplot of Features Colored by Risk Level", y=1.02)
+plt.show()
+```
+
+```{python}
+# Boxplots of features by RiskLevel
+features = ['Age', 'SystolicBP', 'DiastolicBP', 'BloodGlucose', 'BodyTemp', 'HeartRate']
+plt.figure(figsize=(18, 12))
+for i, col in enumerate(features):
+    plt.subplot(2, 3, i+1)
+    sns.boxplot(x='RiskLevel', y=col, data=maternal, palette="pastel")
+    plt.xlabel("Risk Level")
+    plt.ylabel(col)
+    plt.title(f"{col} by Risk Level")
+    plt.xticks([0, 1, 2], ['Low', 'Mid', 'High'])
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# Scatter plots for key relationships
+plt.figure(figsize=(16, 6))
+plt.subplot(1, 2, 1)
+sns.scatterplot(x='SystolicBP', y='DiastolicBP', hue='RiskLevel', data=maternal, palette="Set1")
+plt.title("Systolic vs Diastolic BP by Risk Level")
+plt.xlabel("Systolic BP (mmHg)")
+plt.ylabel("Diastolic BP (mmHg)")
+
+plt.subplot(1, 2, 2)
+sns.scatterplot(x='BloodGlucose', y='BodyTemp', hue='RiskLevel', data=maternal, palette="Set1")
+plt.title("Blood Glucose vs Body Temp by Risk Level")
+plt.xlabel("Blood Glucose (mmol/L)")
+plt.ylabel("Body Temp (°C)")
+plt.tight_layout()
+plt.show()
+```
+
+# Key Observations from the Visualizations
+- The low risk pregnancies are the most frequent overall, they happen in more than half of the cases.
+- Younger women tend to have low and mid risk pregnancies, while the pregnancies of women above 35 y.o. more often are classified as high risk, thus, need more attention.
+- If a pregnant woman has a blood sugar higher than 8 mmol/L, in most of the cases, the pregnancy is considered high risk.
+- Distribution of lower value of blood pressure is more spread, around 60-100 mmHg, compared to distribution of upper value, which is centered around 120 mmHg.
+- Higher blood pressure (both systolic and diastolic), higher body temperature are associated with higher risk pregnancies.
+- As for correlation between age and blood pressure, very low blood pressure (both systolic and diastolic) was observed in some of the girls and young women, but normal and high blood pressure don't seem to be much correlated with age, at least in our dataset.
+- Heart rate of pregnant women is normally distributed and it's only slightly associated with risk level.
+
+# Feature Engineering
+## Separating the feature and target column
+
+```{python}
+x = maternal.drop('RiskLevel', axis = 1)  
+y = maternal['RiskLevel'] 
+```
+# Feature Scaling
+## Won't be done yet
+
+## Balancing the dataset using oversampling RandomOverSampler 
+```{python}
+# Balancing the dataset using RandomOverSampler from imblearn 
+from imblearn.over_sampling import RandomOverSampler
+ros = RandomOverSampler(random_state=42)
+x_sm, y_sm = ros.fit_resample(x, y)
+oversample_plot = y_sm.value_counts().reset_index()
+```
+
+```{python}
+# Plot showing distribution of newly balanced data
+sns.barplot(x="RiskLevel", y="count", data=oversample_plot)
+plt.title("Status after upsampling")
+```
+
+# Modeling, Model Evaluation and Hyperparameter tuning:
+```{python}
+# importing required libraries
+from sklearn.model_selection import train_test_split
+```
+
+```{python}
+# Spliting the dataset into training and test sets to ensure the model's generalizability.
+x_train,x_test,y_train,y_test = train_test_split(x_sm,y_sm,test_size = 0.2,random_state=4)
+```
+
+## Models to try
+1. Support Vector Classifier
+2. KNN
+3. Decision Tree Classifier
+4. Random Forest Classifier
+5. Gradient Boosting Classifier
+7. Extra Trees Classifier
+
+## Support Vector Classifier
+```{python}
+# fitting the model
+from sklearn.svm import SVC  
+svc = SVC()  
+svc.fit(x_train, y_train)  
+y_pred = svc.predict(x_test)  
+```
+
+```{python}
+# Model Evaluation
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report  
+svc_train_acc = accuracy_score(y_train, svc.predict(x_train))  
+svc_test_acc = accuracy_score(y_test, y_pred)  
+print (f"Training accuracy of Support Vector Classifier is: {svc_train_acc}")  
+print (f"Test accuracy of Support Vector Classifier is: {svc_test_acc}")  
+print(confusion_matrix(y_test, y_pred))  
+print(classification_report (y_test, y_pred))  
+```
+## KNN
+```{python}
+# fitting the model
+from sklearn.neighbors import KNeighborsClassifier  
+knn = KNeighborsClassifier (n_neighbors = 30)  
+knn.fit(x_train, y_train)  
+y_pred = knn.predict(x_test)  
+```
+
+```{python}
+# Model Evaluation
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+knn_train_acc = accuracy_score(y_train, knn.predict(x_train))
+knn_test_acc = accuracy_score(y_test, y_pred)
+print (f"Training accuracy of KNN is {knn_train_acc}")
+print (f"Test accuracy of KNN is: {knn_test_acc}")
+print(confusion_matrix(y_test, y_pred))
+print (classification_report (y_test, y_pred))
+```
+
+## Decision Tree Classifier
+
+```{python}
+# fitting the model
+from sklearn.tree import DecisionTreeClassifier  
+dtc = DecisionTreeClassifier()  
+dtc.fit(x_train, y_train)  
+y_pred = dtc.predict(x_test)  
+```
+
+```{python}
+# Model Evaluation
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report  
+dtc_train_acc = accuracy_score(y_train, dtc.predict(x_train))  
+dtc_test_acc = accuracy_score(y_test, y_pred)  
+print (f"Training accuracy of Decision Tree is: {dtc_train_acc}")  
+print (f"Test accuracy of Decision Tree is: {dtc_test_acc}")  
+print(confusion_matrix(y_test, y_pred))  
+print(classification_report(y_test, y_pred))  
+```
+
+```{python}
+# Hyperparmeter tuning
+from sklearn.model_selection import GridSearchCV  
+grid_params = {  
+'criterion': ['gini', 'entropy'],  
+'max_depth': [3, 5, 7, 10],  
+'min_samples_split': range(2, 10, 1),  
+'min_samples_leaf': range(2, 10, 1)  
+}  
+grid_search = GridSearchCV(dtc, grid_params, cv = 5, n_jobs = 1, verbose = 1)  
+grid_search.fit(x_train, y_train)  
+```
+
+```{python}
+# Printing the best parameters and the best score
+print(grid_search.best_params_)  
+print(grid_search.best_score_)  
+```
+
+```{python}
+# Fitting the best estimator
+dtc = grid_search.best_estimator_    
+y_pred = dtc.predict(x_test)  
+```
+
+```{python}
+# Model Evaluation
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+dtc_train_acc = accuracy_score(y_train, dtc.predict(x_train))
+dtc_test_acc = accuracy_score(y_test, y_pred)
+print (f"Training accuracy of Decision Tree is: {dtc_train_acc}")
+print (f"Test accuracy of Decision Tree is: {dtc_test_acc}")
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+```
+
+## Random Forest Classifier
+```{python}
+# Fitting the model
+from sklearn.ensemble import RandomForestClassifier  
+rand_clf = RandomForestClassifier(criterion= 'entropy',  
+max_depth= 10,  
+max_features= 'sqrt',  
+min_samples_leaf= 1,  
+min_samples_split= 3,  
+n_estimators= 140)  
+rand_clf.fit(x_train, y_train)  
+y_pred = rand_clf.predict(x_test)  
+```
+
+```{python}
+# Model Evaluation
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+rand_clf_train_acc = accuracy_score(y_train, rand_clf.predict(x_train))
+rand_clf_test_acc = accuracy_score(y_test, y_pred)
+print (f"Training accuracy of Random Forest is: {rand_clf_train_acc}")
+print (f"Test accuracy of Random Forest is: {rand_clf_test_acc}")
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+```
+
+## Gradient boosting classifier
+
+```{python}
+# Fitting the model
+from sklearn.ensemble import GradientBoostingClassifier
+gbc = GradientBoostingClassifier()
+gbc.fit(x_train, y_train)
+y_pred = gbc.predict(x_test)
+```
+
+```{python}
+# Model Evaluation
+gbc_train_acc = accuracy_score(y_train, gbc.predict(x_train))
+gbc_test_acc = accuracy_score(y_test, y_pred)
+print(f"Training accuracy of Gradient Boosting is: {gbc_train_acc}")
+print(f"Test accuracy of Gradient Boosting is: {gbc_test_acc}")
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+```
+
+## Extra Trees Classifier
+
+```{python}
+# Fitting the model
+from sklearn.ensemble import ExtraTreesClassifier
+etc = ExtraTreesClassifier()
+etc.fit(x_train, y_train)
+y_pred = etc.predict(x_test)
+```
+
+```{python}
+# Model Evaluation
+etc_train_acc = accuracy_score(y_train, etc.predict(x_train))
+etc_test_acc = accuracy_score(y_test, y_pred)
+print(f"Training accuracy of Extra Trees is: {etc_train_acc}")
+print(f"Test accuracy of Extra Trees is: {etc_test_acc}")
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+```
+
+# Model Performance Comparison
+```{python}
+# Creating a dataframe showing the best performing models
+models = pd.DataFrame({
+'Model' : ['SVC','KNN','Decision Tree','Random Forest','Gradient Boost','Extra Trees'],
+'Score' : [svc_test_acc, knn_test_acc, dtc_test_acc, rand_clf_test_acc, gbc_test_acc, etc_test_acc]
+})
+models = models.sort_values(by = 'Score', ascending = False)
+models
+```
+
+## Model Performance Comparison Visualization
+```{python}
+# Bar chart showing plot of models based on performance
+px.bar(data_frame=models, x='Score', y='Model', color='Score', template='plotly_dark',
+       title='Models comparison')
+```
+
+# Model Interpretation:
+## Model Interpretation with SHAP 
+```{python}
+# SHAP interpretation for Extra tree Classifier model
+import shap
+```
+
+```{python}
+# Create an explainer object for the Extra tree Classifier model
+explainer = shap.TreeExplainer(etc)
+```
+
+```{python}
+# Calculate SHAP values for the test set
+shap_values = explainer.shap_values(x_test)
+```
+
+```{python}
+# Summary plot for feature importance
+shap.summary_plot(shap_values, x_test, plot_type="bar", show=True)
+```
+
+# Deployment & Prediction
+```{python}
+# Save the trained Extra trees model
+import joblib
+joblib.dump(etc, 'extra_trees_model.pkl')
+```
+
