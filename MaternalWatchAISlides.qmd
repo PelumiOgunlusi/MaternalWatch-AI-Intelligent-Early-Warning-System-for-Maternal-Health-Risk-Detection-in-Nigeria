@@ -1,0 +1,68 @@
+---
+title: "MaternalWatch AI: Intelligent Early Warning System for Maternal Health Risk Detection"
+author: PELUMI OGUNLUSI
+format:
+    revealjs:
+        theme: simple
+        slide-number: true
+        transition: fade
+---
+
+# Problem Statement
+
+## The Maternal Health Crisis in Nigeria
+
+- Nigeria accounts for **29% of global maternal deaths** (~75,000 annually)
+- Maternal mortality rate: **993 per 100,000 live births** (2023)
+- Key challenges:
+    - Inadequate rural healthcare infrastructure
+    - Limited access to skilled providers
+    - Late detection of high-risk pregnancies
+    - Poor digitization and delayed interventions
+
+---
+
+# Product Overview
+
+## Introducing MaternalWatch AI
+
+- **Digital health platform** leveraging AI/ML for real-time maternal risk assessment
+- **Mobile health technology** for continuous monitoring
+- **Predictive analytics** to classify pregnancy risk (low, mid, high)
+- **Telemedicine integration** to connect mothers with healthcare providers
+
+---
+
+# Key Features
+
+## 1. Predictive Risk Assessment
+- Machine learning models analyze vital signs and health data
+
+## 2. Real-Time Monitoring
+- Mobile app tracks symptoms and vital signs
+- SMS/voice alerts for low-connectivity areas
+
+## 3. Early Warning System
+- AI-powered alerts to providers for timely intervention
+
+## 4. Telemedicine
+- Remote consultations for underserved communities
+
+## 5. Data Integration
+- Syncs with National Health Management Information System (NHMIS)
+
+---
+
+# Scale & Sustainability
+
+## Growth and Long-Term Impact
+
+- **Scalable**: Cloud-based, supports urban & rural deployment
+- **Sustainable**: Integrates with existing health systems and community health workers
+- **Evidence-based**: Similar digital interventions reduced maternal mortality by 20%
+- **Data-driven**: Supports policy, resource allocation, and continuous improvement
+
+---
+
+# Working Demo
+- The app is also deployed online for broader accessibility and integration into healthcare workflows which is available [here](https://maternalwatchai.streamlit.app/).

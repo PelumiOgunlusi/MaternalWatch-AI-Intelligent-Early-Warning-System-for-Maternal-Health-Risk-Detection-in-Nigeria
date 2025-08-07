@@ -20,6 +20,7 @@ MaternalWatch AI is a digital health platform leveraging artificial intelligence
     - [6. Model Comparison](#6-model-comparison)
     - [7. Model Interpretation](#7-model-interpretation)
     - [8. Model Deployment](#8-model-deployment)
+    - [9. Streamlit Web Application](#9-streamlit-web-application)
 - [Results & Insights](#results--insights)
 - [References](#references)
 
@@ -122,8 +123,19 @@ Nigeria faces a severe maternal health crisis, with high maternal mortality rate
 
 - Save the trained Extra Trees model using `joblib` for future predictions and integration.
 
----
+### 9. Streamlit Web Application
 
+- Developed an interactive Streamlit web app for real-time maternal health risk prediction.
+- The app allows users to input patient data and instantly receive risk assessments using the trained Extra Trees model.
+- The web interface performs data preprocessing, prediction, and displays results and feature explanations dynamically.
+- To run the app locally:
+    ```
+    pip install streamlit
+    streamlit run maternal.py
+    ```
+- The app is also deployed online for broader accessibility and integration into healthcare workflows which is available [here](https://maternalwatchai.streamlit.app/).
+
+---
 ## Results & Insights
 
 - **Best Model:** Extra Trees Classifier (highest test accuracy).
@@ -150,5 +162,6 @@ For questions or collaboration, please contact [PELUMI OGUNLUSI](mailto:your-ema
 ---
 
 **Note:** This project is for educational and research purposes. For clinical use, further validation and regulatory approval are required.
+
 
 
