@@ -3,6 +3,8 @@
 import streamlit as st
 import numpy as np
 import joblib
+import smtplib
+from email.mime.text import MIMEText
 
 # Load the trained Extra Trees model
 model = joblib.load("extra_trees_model.pkl")
@@ -57,3 +59,55 @@ if st.button("Predict Risk Level"):
 
 st.markdown("---")
 st.caption("Powered by Extra Trees Classifier | MaternalWatch AI")
+
+
+st.sidebar.header("Hospital Alert Details")
+hospital_name = st.sidebar.text_input("Nearest Maternity Hospital Name")
+hospital_email = st.sidebar.text_input("Hospital Contact Email")
+patient_phone = st.sidebar.text_input("Your Phone Number")
+
+
+def send_alert_email(hospital, email, patient_data, phone):
+    subject = "High Risk Maternal Health Alert"
+    body = (
+        f"Alert: A patient has been assessed as HIGH RISK for maternal health complications.\n\n"
+        f"Nearest Hospital: {hospital}\n"
+        f"Patient Data: {patient_data}\n\n"
+        f"Patient Phone Number: {phone}\n\n"
+        "Please prepare for possible emergency care and contact the patient as soon as possible."
+    )
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = "alert@maternalwatch.ai"
+    msg["To"] = email
+
+    try:
+        # Example using Gmail SMTP server (replace with your credentials)
+        # Make sure to enable 2-Step Verification on your Google account and generate an App Password.
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 587
+        sender_email = "pelumiogunlusi@gmail.com"  # Replace with your Gmail address
+        sender_password = "ezbp ejiw lngf tcmk"  # Replace with your generated App Password from Google Account settings
+
+        msg["From"] = sender_email
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+        return True
+    except Exception as e:
+        st.error(f"Failed to send alert email: {e}")
+        return False
+
+
+if "prediction" in locals() and prediction == 2:
+    if hospital_name and hospital_email and patient_phone:
+        if send_alert_email(hospital_name, hospital_email, input_data, patient_phone):
+            st.success(
+                f"Alert sent to {hospital_name} ({hospital_email}) for High Risk case."
+            )
+    else:
+        st.warning(
+            "Please provide the hospital name, email, and your phone number to enable alert notifications."
+        )
